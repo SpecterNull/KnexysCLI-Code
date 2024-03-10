@@ -337,6 +337,10 @@ def KnexysCLI():
 			print("Incorrect.")
 			Passcode()
 
+	def Space():
+		for i in range(500):
+			print(" ")
+
 	def PasscodeI():
 		global U, ThetaI
 		ThetaI = False
@@ -363,6 +367,7 @@ def KnexysCLI():
 		Entry()
 
 	def Restart():
+		Space()
 		Clear()
 		Start()
 		return()
