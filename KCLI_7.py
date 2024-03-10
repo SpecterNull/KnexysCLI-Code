@@ -358,6 +358,7 @@ def KnexysCLI():
 		PasscodeInfo()
 
 	def Start():
+		Clear()
 		global Start
 		print("[=====]")
 		Entry()
