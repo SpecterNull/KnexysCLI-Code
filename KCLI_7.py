@@ -18,15 +18,9 @@ def KnexysCLI():
 		import os
 		import platform
 		ms = [
-			'\033[2J\033[3J\033[H',
-			"\033c",
-			"\033[1;1H\033[2J",
 			'cls' if platform.system() == 'Windows' else 'clear',
 			'tput clear',
-			'reset',
-			'printf \033c',
-			'echo -e "\e[1;1H\e[2J"',
-			'printf \033c'
+			'reset'
 		]
 		for m in ms:
 			try:
