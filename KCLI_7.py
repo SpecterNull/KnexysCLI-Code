@@ -1,3 +1,5 @@
+#Hello, my name is Ayan, but you can call me A, I started coding a few months ago, and this is my project, this code was made in 2023.
+
 def KnexysCLI():
 	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE
 	U = "0000"
