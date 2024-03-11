@@ -349,7 +349,7 @@ def KnexysCLI():
 			print("Correct, Access Granted.")
 			Level()
 			Terminal()
-		elif ("Exit" == ThetaI):
+		elif ("Exit" == Theta):
 			print("Exited KCLI.")
 		else:
 			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
