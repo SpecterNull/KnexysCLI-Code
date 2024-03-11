@@ -1,18 +1,35 @@
-#Hello, my name is Ayan, but you can call me A, I started coding a few months ago, and this is my project, this code was made in 2023.
-
 def KnexysCLI():
-	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE
+	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET
+	LIGHT_BLUE = '\033[94m'
+	COLOR_RESET = '\033[0m'
+	GREEN_BOLD = '\033[1;92m'
+	DARK_RED_BOLD = '\033[1m\033[91m'
+	Y = GREEN_BOLD + "Passcode: " + COLOR_RESET + LIGHT_BLUE
+	text = ""
+	BOLD = '\033[1m'
+	DARK_RED = '\033[31m'
+	GREEN = '\033[92m'
+	Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
+	X = DARK_RED_BOLD + "Admin@Knexys: " + COLOR_RESET + LIGHT_BLUE
+	Z = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	U = "0000"
 	C = "0000"
-	X = "Admin@Knexys: "
-	Z = "User@Knexys: "
-	Alpha = "User@Knexys: "
 	FA = "No file exists, to create one, type 'File_Create'."
 	FB = "No file exists, to create one, type 'File_Create'."
 	FC = "No file exists, to create one, type 'File_Create'."
 	FD = "No file exists, to create one, type 'File_Create'."
 	FE = "No file exists, to create one, type 'File_Create'."
 	Gamma = False
+
+	def ChangeText(text):
+		import os
+		LIGHT_BLUE = '\033[94m'
+		COLOR_RESET = '\033[0m'
+		if "[=====]" in text:
+			changed_text = text.replace("[=====]", LIGHT_BLUE + "[=====]" + LIGHT_BLUE)
+			return changed_text
+		else:
+			return text
 
 	def Clear():
 		import os
@@ -62,7 +79,7 @@ def KnexysCLI():
 	def FileCreateA():
 		global FA
 		print("Create a file here. Files are used for documentation, notes, etc.")
-		print("Enter the content of the file. (Press Enter three times to finish.)")
+		print("Enter the content of the file. (Press Enter three times to finish.")
 		clA = []
 		celA = 0
 		while celA < 3:
@@ -171,7 +188,7 @@ def KnexysCLI():
 		elif("User" == Gamma):
 			Alpha = Z
 		else:
-			Alpha = "User@Knexys: "
+			Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
 
 	def Decide():
 		global Alpha, Gamma, X, Z
@@ -264,16 +281,19 @@ def KnexysCLI():
 			Command()
 		elif ("Help" == Beta):
 			print("If you're typing a command, don't include the quotes, or anything oustide the quotes.")
+			print("Only include what's inside of the quotes..")
 			print("Type all commands with uppercase beginnings")
 			print("Here's a list of commands you can do.")
 			List()
 			Command()
 		elif ("Exit" == Beta):
-			print("KnexysCLI has been exited.")
+			print(DARK_RED_BOLD + "KnexysCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
 		elif ("Edit_Passcode" == Beta):
 			AccessI()
 		elif ("Info" == Beta):
-			print("KnexysCLI is a program created by Knexys, the main purpose of this code is creating, viewing, and managing files. Knexys is a group with 4 main goals, control, power, strength, and intelligence.")
+			print("KnexysCLI is a program created by Knexys.")
+			print("The main purpose of this code is creating, viewing, and managing files.")
+			print("Knexys is a group with 4 main goals, control, power, strength, and) intelligence.")
 			Command()
 		elif ("Permissions" == Beta):
 			Ed()
@@ -293,7 +313,7 @@ def KnexysCLI():
 		elif ("Restart" == Beta):
 			Restart()
 		else:
-			print("Error_001")
+			print(DARK_RED_BOLD + "Error_001" + COLOR_RESET + LIGHT_BLUE)
 			Command()
 
 	def Create():
@@ -324,13 +344,13 @@ def KnexysCLI():
 	def Passcode():
 		global C
 		Theta = False
-		Theta = input("Passcode: ")
+		Theta = input(Y)
 		if (Theta == C):
 			print("Correct, Access Granted.")
 			Level()
 			Terminal()
 		else:
-			print("Incorrect.")
+			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
 			Passcode()
 
 	def Space():
@@ -340,16 +360,16 @@ def KnexysCLI():
 	def PasscodeI():
 		global U, ThetaI
 		ThetaI = False
-		ThetaI = input("Passcode: ")
+		ThetaI = input(Y)
 		if (U == ThetaI):
 			print("Correct, Access Granted.")
 			Decide()
 		else:
-			print("Incorrect.")
+			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
 			PasscodeI()
 
 	def PasscodeInfo():
-		print("Defualt Passcode: '0000'.")
+		print("Default Passcode: '0000'.")
 		print("Enter passcode to gain accsess.")
 		Passcode()
 
@@ -359,8 +379,8 @@ def KnexysCLI():
 
 	def Start():
 		Clear()
-		global Start
-		print("[=====]")
+		text = ChangeText("[=====]")
+		print(LIGHT_BLUE + "[=====]" + LIGHT_BLUE)
 		Entry()
 
 	def Restart():
