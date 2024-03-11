@@ -349,6 +349,8 @@ def KnexysCLI():
 			print("Correct, Access Granted.")
 			Level()
 			Terminal()
+		elif ("Exit" == ThetaI):
+			print("Exited KCLI.")
 		else:
 			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
 			Passcode()
@@ -364,6 +366,9 @@ def KnexysCLI():
 		if (U == ThetaI):
 			print("Correct, Access Granted.")
 			Decide()
+		elif ("Return" == ThetaI):
+			print("Returned to KCLI.")
+			Command()
 		else:
 			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
 			PasscodeI()
