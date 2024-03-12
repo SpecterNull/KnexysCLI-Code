@@ -23,14 +23,15 @@ def KnexysCLI():
 
 	def Scan():
 		import socket
-		import platform
+		def get_owner_name(ip_address):
+			try:
+				hostname, _, _ = socket.gethostbyaddr(ip_address)
+				return hostname
+			except (socket.timeout, ConnectionRefusedError, socket.herror):
+				return 'Unknown_Hostname'
+
 		devices = []
-
-		if platform.system().lower() == 'windows':
-			local_ip = socket.gethostbyname(socket.gethostname())
-		else:
-			local_ip = socket.gethostbyname(socket.getfqdn())
-
+		local_ip = socket.gethostbyname(socket.gethostname())
 		network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
 
 		for i in range(1, 255):
@@ -39,13 +40,14 @@ def KnexysCLI():
 				with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 					s.settimeout(0.1)
 					s.connect((ip_address, 80))
-					devices.append(ip_address)
+					owner_name = get_owner_name(ip_address)
+					devices.append((ip_address, owner_name))
 			except (socket.timeout, ConnectionRefusedError):
-				pass
+				devices.append((ip_address, 'Unknown_Hostname'))
 
-		print("IP addresses of devices on the network:")
-		for ip_address in devices:
-			print(ip_address)
+		print("Obtained IP Addresses:")
+		for ip, owner_name in devices:
+			print(f"{ip}, Name: {owner_name}")
 
 	def ChangeText(text):
 		import os
@@ -262,7 +264,6 @@ def KnexysCLI():
 		Command()
 
 	def View():
-		global Alpha, X, Z
 		if (Alpha == X):
 			print("You have Admin permissions.")
 			Command()
@@ -326,10 +327,13 @@ def KnexysCLI():
 		elif ("Permissions" == Beta):
 			Ed()
 		elif ("Scan" == Beta):
-			print("Scanning IPs...")
-			print("This could take a moment.")
-			Scan()
-			Command()
+			if (Alpha == X):
+				print("Scanning IPs... This could take a moment.")
+				Scan()
+				Command()
+			else:
+				print("You do not have the correct permissions for this command.")
+				Command()
 		elif ("Perms/View" == Beta):
 			View()
 			Command()
@@ -418,7 +422,6 @@ def KnexysCLI():
 
 	def Start():
 		Clear()
-		text = ChangeText("[=====]")
 		print(LIGHT_BLUE + "[=====]" + LIGHT_BLUE)
 		Entry()
 
