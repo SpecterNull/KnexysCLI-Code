@@ -21,6 +21,32 @@ def KnexysCLI():
 	FE = "No file exists, to create one, type 'File_Create'."
 	Gamma = False
 
+	def Scan():
+		import socket
+		import platform
+		devices = []
+
+		if platform.system().lower() == 'windows':
+			local_ip = socket.gethostbyname(socket.gethostname())
+		else:
+			local_ip = socket.gethostbyname(socket.getfqdn())
+
+		network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
+
+		for i in range(1, 255):
+			ip_address = network_prefix + str(i)
+			try:
+				with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+					s.settimeout(0.1)
+					s.connect((ip_address, 80))
+					devices.append(ip_address)
+			except (socket.timeout, ConnectionRefusedError):
+				pass
+
+		print("IP addresses of devices on the network:")
+		for ip_address in devices:
+			print(ip_address)
+
 	def ChangeText(text):
 		import os
 		LIGHT_BLUE = '\033[94m'
@@ -75,6 +101,7 @@ def KnexysCLI():
 		print("'Restart', Restart this program.")
 		print("'Status', Tests if the code works.")
 		print("'Version', Shows the version of this program.")
+		print("'Scan', Attempt to scan all IPs on a wifi network.")
 
 	def FileCreateA():
 		global FA
@@ -298,6 +325,11 @@ def KnexysCLI():
 			Command()
 		elif ("Permissions" == Beta):
 			Ed()
+		elif ("Scan" == Beta):
+			print("Scanning IPs...")
+			print("This could take a moment.")
+			Scan()
+			Command()
 		elif ("Perms/View" == Beta):
 			View()
 			Command()
