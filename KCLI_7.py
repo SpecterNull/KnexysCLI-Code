@@ -288,6 +288,7 @@ def KnexysCLI():
 			Command()
 		elif ("Exit" == Beta):
 			print(DARK_RED_BOLD + "KnexysCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
+			Clear()
 		elif ("Edit_Passcode" == Beta):
 			AccessI()
 		elif ("Info" == Beta):
@@ -350,7 +351,8 @@ def KnexysCLI():
 			Level()
 			Terminal()
 		elif ("Exit" == Theta):
-			print("Exited KCLI.")
+			print(DARK_RED_BOLD + "KnexysCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
+			Clear()
 		else:
 			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
 			Passcode()
