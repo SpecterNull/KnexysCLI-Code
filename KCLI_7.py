@@ -1,14 +1,14 @@
 def KnexysCLI():
 	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET
-	LIGHT_BLUE = '\033[94m'
-	COLOR_RESET = '\033[0m'
-	GREEN_BOLD = '\033[1;92m'
-	DARK_RED_BOLD = '\033[1m\033[91m'
+	LIGHT_BLUE = ''
+	COLOR_RESET = ''
+	GREEN_BOLD = ''
+	DARK_RED_BOLD = ''
 	Y = GREEN_BOLD + "Passcode: " + COLOR_RESET + LIGHT_BLUE
 	text = ""
-	BOLD = '\033[1m'
-	DARK_RED = '\033[31m'
-	GREEN = '\033[92m'
+	BOLD = ''
+	DARK_RED = ''
+	GREEN = ''
 	Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	X = DARK_RED_BOLD + "Admin@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	Z = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
@@ -21,17 +21,143 @@ def KnexysCLI():
 	FE = "No file exists, to create one, type 'File_Create'."
 	Gamma = False
 
-	def Scan():
+	def Pip():
+		import os
+		import subprocess
+		import sys
+		import platform
+		import urllib.request
+		try:
+			subprocess.run([sys.executable, '-m', 'ensurepip', '--default-pip'], check=True)
+			pass
+		except Exception as eI:
+			print("Error_002")
+			try:
+				urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py')
+				subprocess.run([sys.executable, 'get-pip.py'], check=True)
+				pass
+			except Exception as eII:
+				print("Error_002")
+				try:
+					subprocess.run(['easy_install', 'pip'], check=True)
+					pass
+				except Exception as eIII:
+					print("Error_002")
+
+	def Download():
+		import os
+		packages = ['opencv-python']
+		for package in packages:
+			try:
+				os.system(f'pip install {package}')
+			except Exception as e:
+				pass
+
+	def Cams():
+		import cv2
+		import socket
+		def get_local_ip():
+			try:
+				s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+				s.connect(("8.8.8.8", 80))
+				local_ip = s.getsockname()[0]
+				s.close()
+				return local_ip
+			except Exception as e:
+				print(f"Error getting local IP address: {e}")
+				return None
+
+		def find_webcams():
+			local_ip = get_local_ip()
+			if local_ip:
+				network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
+
+				webcams = []
+				for i in range(1, 255):
+					ip_address = network_prefix + str(i)
+					try:
+						with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+							s.settimeout(0.1)
+							s.connect((ip_address, 554))
+							webcams.append(ip_address)
+					except (socket.timeout, ConnectionRefusedError):
+						pass
+
+				return webcams
+			else:
+				return []
+
+		webcams = find_webcams()
+		if not webcams:
+			print("No webcams found on the network.")
+			return
+
+		for ip_address in webcams:
+			cap = cv2.VideoCapture(f"rtsp://{ip_address}/onvif1")
+			while True:
+				ret, frame = cap.read()
+				if not ret:
+					print(f"Could not read frame from webcam {ip_address}")
+					break
+
+				cv2.imshow(f"Webcam {ip_address}", frame)
+
+				if cv2.waitKey(1) & 0xFF == ord('q'):
+					break
+
+			cap.release()
+			cv2.destroyAllWindows()
+
+	def Scan_Info():
+		import os
+		import platform
+		import subprocess
+		import sys
+		import urllib.request
 		import socket
 		def get_owner_name(ip_address):
 			try:
 				hostname, _, _ = socket.gethostbyaddr(ip_address)
 				return hostname
 			except (socket.timeout, ConnectionRefusedError, socket.herror):
-				return 'Unknown_Hostname'
+				return 'Unknown_Hostname.'
+
+		def get_local_ip():
+			return socket.gethostbyname(socket.gethostname())
+
+		def get_public_ip():
+			try:
+				with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+					s.connect(("8.8.8.8", 80))
+					return s.getsockname()[0]
+			except Exception:
+				return 'Unknown_Public_IP'
+
+		def get_device_info(ip_address):
+			try:
+				info = subprocess.check_output(['nmap', '-O', ip_address], stderr=subprocess.DEVNULL)
+				return info.decode('utf-8')
+			except Exception:
+				return 'Device info not available.'
+
+		def get_vulnerabilities(ip_address):
+			try:
+				vulnerabilities = subprocess.check_output(['nmap', '--script', 'vuln', ip_address], stderr=subprocess.DEVNULL)
+				return vulnerabilities.decode('utf-8')
+			except Exception:
+				return 'Vulnerabilities not available.'
+
+		def get_geolocation(ip_address):
+			try:
+				url = f"http://ip-api.com/json/{ip_address}"
+				response = urllib.request.urlopen(url)
+				data = response.read().decode('utf-8')
+				return data
+			except Exception:
+				return 'Geolocation not available.'
 
 		devices = []
-		local_ip = socket.gethostbyname(socket.gethostname())
+		local_ip = get_local_ip()
 		network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
 
 		for i in range(1, 255):
@@ -41,13 +167,30 @@ def KnexysCLI():
 					s.settimeout(0.1)
 					s.connect((ip_address, 80))
 					owner_name = get_owner_name(ip_address)
-					devices.append((ip_address, owner_name))
+					public_ip = get_public_ip()
+					device_info = get_device_info(ip_address)
+					vulnerabilities = get_vulnerabilities(ip_address)
+					geolocation = get_geolocation(ip_address)
+					devices.append({
+						'IP': ip_address,
+						'Hostname': owner_name,
+						'Public_IP': public_ip,
+						'Device_Info': device_info,
+						'Vulnerabilities': vulnerabilities,
+						'Geolocation': geolocation
+					})
 			except (socket.timeout, ConnectionRefusedError):
-				devices.append((ip_address, 'Unknown_Hostname'))
+				pass
 
-		print("Obtained IP Addresses:")
-		for ip, owner_name in devices:
-			print(f"{ip}, Name: {owner_name}")
+		print("Obtained Information:")
+		for device in devices:
+			print(f"IP: {device['IP']}")
+			print(f"Hostname: {device['Hostname']}")
+			print(f"Public IP: {device['Public_IP']}")
+			print(f"Device Info: {device['Device_Info']}")
+			print(f"Vulnerabilities: {device['Vulnerabilities']}")
+			print(f"Geolocation: {device['Geolocation']}\n")
+		return devices
 
 	def ChangeText(text):
 		import os
@@ -83,15 +226,17 @@ def KnexysCLI():
 		BB = input("New Permissions Passcode: ")
 		U = AA
 		print("All done, KnexysCLI has restarted.")
+		Space()
 		Restart()
 
 	def CheckI():
 		print("Default Passcode is '0000'.")
 		PasscodeI()
 
+
 	def List():
-		print("'File_Create', Create a file.")
-		print("'File_Read', Read a file.")
+		print("'File Create', Create a file.")
+		print("'File Read', Read a file.")
 		print("'Permissions', Edit permissions.")
 		print("'Perms/View', View permissions.")
 		print("'Perms/Passcode', Edit permissions passcode.")
@@ -103,7 +248,8 @@ def KnexysCLI():
 		print("'Restart', Restart this program.")
 		print("'Status', Tests if the code works.")
 		print("'Version', Shows the version of this program.")
-		print("'Scan', Attempt to scan all IPs on a wifi network.")
+		print("'Scan_Info', Attempt to scan info of users on your network.")
+		print("'Cams', Find and open webcams on your network.")
 
 	def FileCreateA():
 		global FA
@@ -300,11 +446,11 @@ def KnexysCLI():
 		Level()
 		Beta = False
 		Beta = input(Alpha)
-		if ("File_Create" == Beta):
+		if ("File Create" == Beta):
 			Create()
 		elif ("Perms/Passcode" == Beta):
 			Access()
-		elif ("File_Read" == Beta):
+		elif ("File Read" == Beta):
 			FileView()
 			Command()
 		elif ("Help" == Beta):
@@ -320,16 +466,32 @@ def KnexysCLI():
 		elif ("Edit_Passcode" == Beta):
 			AccessI()
 		elif ("Info" == Beta):
-			print("KnexysCLI is a program created by Knexys.")
+			print("KnexysCLI is a program owned by Knexys.")
 			print("The main purpose of this code is creating, viewing, and managing files.")
 			print("Knexys is a group with 4 main goals, control, power, strength, and) intelligence.")
 			Command()
 		elif ("Permissions" == Beta):
 			Ed()
-		elif ("Scan" == Beta):
+		elif ("Scan_Info" == Beta):
 			if (Alpha == X):
 				print("Scanning IPs... This could take a moment.")
-				Scan()
+				Scan_Info()
+				Command()
+			else:
+				print("You do not have the correct permissions for this command.")
+				Command()
+		elif ("Cams" == Beta):
+			if (Alpha == X):
+				print("Finding Cameras...")
+				Cams()
+				Command()
+			else:
+				print("You do not have the correct permissions for this command.")
+				Command()
+		elif ("Mic" == Beta):
+			if (Alpha == X):
+				print("Finding Microphones...")
+				Mic()
 				Command()
 			else:
 				print("You do not have the correct permissions for this command.")
@@ -343,11 +505,13 @@ def KnexysCLI():
 		elif ("Error_List" == Beta):
 			print("All Errors Below:")
 			print("Error_001: Command was not found.")
+			print("Error_002: Pip was not installed correctly, some commands may not work.")
 			Command()
 		elif ("Status" == Beta):
 			print("Checking Systems... All Good.")
 			Command()
 		elif ("Restart" == Beta):
+			Space()
 			Restart()
 		else:
 			print(DARK_RED_BOLD + "Error_001" + COLOR_RESET + LIGHT_BLUE)
@@ -420,16 +584,18 @@ def KnexysCLI():
 		print("KnexysCLI")
 		PasscodeInfo()
 
-	def Start():
+	def Restart():
 		Clear()
 		print(LIGHT_BLUE + "[=====]" + LIGHT_BLUE)
 		Entry()
-
-	def Restart():
-		Space()
-		Clear()
-		Start()
 		return()
+
+	def Start():
+		Clear()
+		Pip()
+		Download()
+		Clear()
+		Restart()
 
 	Start()
 	return()
