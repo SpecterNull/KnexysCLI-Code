@@ -309,7 +309,7 @@ def KnexysCLI():
 			Command()
 		elif ("Help" == Beta):
 			print("If you're typing a command, don't include the quotes, or anything oustide the quotes.")
-			print("Only include what's inside of the quotes..")
+			print("Only include what's inside of the quotes.")
 			print("Type all commands with uppercase beginnings")
 			print("Here's a list of commands you can do.")
 			List()
