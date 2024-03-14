@@ -1,5 +1,5 @@
 def KnexysCLI():
-	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET, Command
+	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET, Command, subprocess
 	LIGHT_BLUE = ''
 	COLOR_RESET = ''
 	GREEN_BOLD = ''
@@ -9,7 +9,6 @@ def KnexysCLI():
 	BOLD = ''
 	DARK_RED = ''
 	GREEN = ''
-	Run = ""
 	Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	X = DARK_RED_BOLD + "Admin@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	Z = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
@@ -89,6 +88,7 @@ def KnexysCLI():
 
 		def Install1():
 			try:
+				global subprocess
 				subprocess.run(["pip", "install", "python-nmap"], check=True)
 				print("Installed successfully.")
 			except subprocess.CalledProcessError as e:
