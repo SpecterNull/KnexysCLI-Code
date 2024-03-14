@@ -89,6 +89,7 @@ def KnexysCLI():
 		def Install1():
 			try:
 				global subprocess
+				import subprocess
 				subprocess.run(["pip", "install", "python-nmap"], check=True)
 				print("Installed successfully.")
 			except subprocess.CalledProcessError as e:
