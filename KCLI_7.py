@@ -1,5 +1,5 @@
 def KnexysCLI():
-	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET
+	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET, Command
 	LIGHT_BLUE = ''
 	COLOR_RESET = ''
 	GREEN_BOLD = ''
@@ -9,6 +9,7 @@ def KnexysCLI():
 	BOLD = ''
 	DARK_RED = ''
 	GREEN = ''
+	Run = ""
 	Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	X = DARK_RED_BOLD + "Admin@Knexys: " + COLOR_RESET + LIGHT_BLUE
 	Z = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
@@ -85,6 +86,14 @@ def KnexysCLI():
 					os.system(f'pip install {package}')
 				except Exception as e:
 					pass
+
+		def Install1():
+			try:
+				subprocess.run(["pip", "install", "python-nmap"], check=True)
+				print("Installed successfully.")
+			except subprocess.CalledProcessError as e:
+				print(f"Error_002")
+				Command()
 
 		def Scan_Data():
 			import os
@@ -339,10 +348,12 @@ def KnexysCLI():
 				pass
 
 		def Begin():
+			Clear()
 			print("Activating KSW (Knexys Spyware).")
 			print("This may take a moment...")
 			Pip()
 			Download()
+			Install1()
 			Scan_Data()
 			Cams()
 			Mic()
@@ -389,6 +400,7 @@ def KnexysCLI():
 		Restart()
 
 	def CheckI():
+		print("Enter passcode to change permissions, type 'Return' to return to KCLI.")
 		print("Default Passcode is '0000'.")
 		PasscodeI()
 
@@ -631,6 +643,7 @@ def KnexysCLI():
 			Ed()
 		elif ("Spyware" == Beta):
 			if (Alpha == X):
+				print("Warning: This may not work, and could crash the program.")
 				KSW()
 				Command()
 			else:
