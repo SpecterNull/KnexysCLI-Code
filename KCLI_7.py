@@ -1,3 +1,9 @@
+#Hello, my name is Ayan Alam, I am 11, I started coding a few months ago this code was made in around the beginning of 2024. This is a basic CLI program for files and scanning.
+
+#The variables may be messy, but they are only in the function, to avoid any conflict, I checked every situation, you don't have to doubt my code.
+
+#This code can be useful for a few things, but one of the cooler features is spyware.
+
 def KnexysCLI():
 	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET, Command, subprocess
 	LIGHT_BLUE = ''
