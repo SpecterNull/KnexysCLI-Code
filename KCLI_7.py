@@ -51,7 +51,7 @@ def KnexysCLI():
 			try:
 				os.system(f'pip install {package}')
 			except Exception as e:
-				pass
+				print("Error_002")
 
 	def KSW():
 		def Pip():
@@ -79,41 +79,27 @@ def KnexysCLI():
 
 		def Download():
 			import os
-			packages = ['requests','python-nmap','tqdm','opencv-python','sounddevice','soundfile']
+			packages = ['requests','tqdm','opencv-python','sounddevice','soundfile']
 			for package in packages:
 				try:
 					os.system(f'pip install {package}')
 				except Exception as e:
-					pass
+					print("Error_002")
 
-		def Install1():
-			try:
-				global subprocess
-				import subprocess
-				subprocess.run(["pip", "install", "python-nmap"], check=True)
-				print("Installed successfully.")
-			except subprocess.CalledProcessError as e:
-				print(f"Error_002")
-				Command()
-
-		def Scan_Data():
-			import os
-			import platform
-			import subprocess
-			import socket
-			import requests
-			import ipaddress
-			from tqdm import tqdm
-			import nmap
+		def D2():
 			try:
 				import requests
-				import nmap
 				from tqdm import tqdm
 			except ImportError:
 				print("Installing required packages...")
-				subprocess.run(["pip", "install", "requests", "python-nmap", "tqdm"])
+				subprocess.run(["pip", "install", "requests", "tqdm"])
 				print("Packages installed successfully!")
 
+		def Scan_Data():
+			import os
+			import socket
+			import requests
+			from tqdm import tqdm
 			def get_owner_name(ip_address):
 				try:
 					hostname, _, _ = socket.gethostbyaddr(ip_address)
@@ -140,35 +126,9 @@ def KnexysCLI():
 				except Exception:
 					return 'Geolocation not available'
 
-			def scan_network(network):
-				nm = nmap.PortScanner()
-				nm.scan(hosts=network, arguments='-sP')
-
-				active_hosts = []
-
-				for host in nm.all_hosts():
-					if nm[host]['status']['state'] == 'up':
-						active_hosts.append(host)
-
-				return active_hosts
-
-			def scan_host(ip_address):
-				try:
-					nm = nmap.PortScanner()
-					nm.scan(hosts=ip_address, arguments='-O -sV --script vuln')
-
-					if ip_address in nm.all_hosts():
-						return nm[ip_address]
-					else:
-						return None
-				except Exception as e:
-					print(f"Error scanning host {ip_address}: {e}")
-					return None
-
 			devices = []
 			local_ip = get_local_ip()
 			network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
-
 			for i in range(1, 255):
 				ip_address = network_prefix + str(i)
 				try:
@@ -177,13 +137,11 @@ def KnexysCLI():
 						s.connect((ip_address, 80))
 						owner_name = get_owner_name(ip_address)
 						public_ip = get_public_ip()
-						device_info = scan_host(ip_address)
 						geolocation = get_geolocation(ip_address)
 						devices.append({
 							'IP': ip_address,
 							'Hostname': owner_name,
 							'Public_IP': public_ip,
-							'Device_Info': device_info,
 							'Geolocation': geolocation
 						})
 				except (socket.timeout, ConnectionRefusedError):
@@ -191,53 +149,54 @@ def KnexysCLI():
 
 			print("Obtained Information:")
 			for device in devices:
+				Clear()
+				print("Knexys Spyware Scan Results: ")
 				print(f"IP: {device['IP']}")
 				print(f"Hostname: {device['Hostname']}")
 				print(f"Public IP: {device['Public_IP']}")
-				print(f"Device Info: {device['Device_Info']}")
 				print(f"Geolocation: {device['Geolocation']}\n")
+				print(" ")
 
 		def Cams():
 			import cv2
 			import requests
 			import socket
-			import nmap
 			import concurrent.futures
 			import logging
+			import os
 			logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 			def get_local_ip():
 				try:
-					return socket.gethostbyname(socket.gethostname())
+					s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+					s.connect(("8.8.8.8", 80))
+					local_ip = s.getsockname()[0]
+					s.close()
+					return local_ip
 				except Exception as e:
 					logging.error(f"Error getting local IP address: {e}")
 					return None
 
 			def discover_devices():
 				devices = []
-
-				nm = nmap.PortScanner()
-
 				try:
 					logging.info("Scanning network for devices...")
-					nm.scan(arguments='-sn', timeout=30)
+					output = os.popen("arp -a").read()
+					lines = output.split('\n')
+					for line in lines:
+						parts = line.split()
+						if len(parts) >= 2:
+							ip_address = parts[0]
+							if ip_address != "Internet":
+								devices.append({'IP': ip_address, 'Hostname': parts[1]})
 					logging.info("Scan completed.")
 				except Exception as e:
 					logging.error(f"Error scanning network: {e}")
-					return []
-
-				for host in nm.all_hosts():
-					try:
-						hostname = nm[host].hostname() if 'hostname' in nm[host] else 'Unknown_Hostname'
-						devices.append({'IP': host, 'Hostname': hostname})
-					except Exception as e:
-						logging.error(f"Error processing host {host}: {e}")
-
 				return devices
 
 			def access_camera(ip_address):
-				web_interface_url = f"http://{ip_address}/login"
 				try:
+					web_interface_url = f"http://{ip_address}/login"
 					response = requests.get(web_interface_url, timeout=10)
 					if response.status_code == 200:
 						video_url = response.json().get('video_url')
@@ -262,74 +221,19 @@ def KnexysCLI():
 						logging.warning(f"Unable to access camera at IP {ip_address}. HTTP status code: {response.status_code}")
 				except requests.RequestException as e:
 					logging.error(f"Error accessing camera at IP {ip_address}: {e}")
-
 			local_ip = get_local_ip()
 			if not local_ip:
 				logging.error("Failed to obtain local IP address. Exiting.")
 				return
-
 			logging.info(f"Local IP address: {local_ip}")
-
 			devices = discover_devices()
 			if not devices:
 				logging.error("No devices found on the network. Exiting.")
 				return
-
 			logging.info(f"Found {len(devices)} devices on the network.")
-
 			with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
 				futures = [executor.submit(access_camera, device['IP']) for device in devices]
-
 			logging.info("All camera access attempts completed.")
-
-		def Mic():
-			import socket
-			import nmap
-			import concurrent.futures
-			import logging
-			import sounddevice as sd
-			import soundfile as sf
-			logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-			try:
-				local_ip = socket.gethostbyname(socket.gethostname())
-			except Exception as e:
-				logging.error(f"Failed to obtain local IP address: {e}")
-				return
-
-			logging.info(f"Local IP address: {local_ip}")
-			try:
-				nm = nmap.PortScanner()
-				nm.scan(arguments='-sn', timeout=30)
-				devices = [{'IP': host, 'Hostname': nm[host].hostname() if 'hostname' in nm[host] else 'Unknown_Hostname'} for host in nm.all_hosts()]
-			except Exception as e:
-				logging.error(f"Error scanning network: {e}")
-				return
-
-			if not devices:
-				logging.error("No devices found on the network. Exiting.")
-				return
-
-			logging.info(f"Found {len(devices)} devices on the network.")
-			with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-				for device in devices:
-					executor.submit(access_microphone, device['IP'])
-
-			logging.info("All microphone access attempts completed.")
-
-			def access_microphone(ip_address):
-				logging.info(f"Listening to microphone at IP address: {ip_address}")
-
-			def callback(indata, frames, time, status):
-				if status:
-					logging.warning(f"Error in audio stream: {status}")
-				filename = f'recorded_audio_{ip_address}.wav'
-				with sf.SoundFile(filename, mode='w', samplerate=44100, channels=1) as file:
-					file.write(indata)
-			try:
-				with sd.InputStream(callback=callback):
-					sd.sleep(100000)
-			except KeyboardInterrupt:
-				pass
 
 		def Clear():
 			import os
@@ -349,15 +253,20 @@ def KnexysCLI():
 				pass
 
 		def Begin():
+			global Command
 			Clear()
 			print("Activating KSW (Knexys Spyware).")
 			print("This may take a moment...")
 			Pip()
 			Download()
-			Install1()
+			D2()
+			Clear()
+			print(" ")
+			print("Activating KSW (Knexys Spyware).")
+			print("This may take a moment...")
+			print(" ")
 			Scan_Data()
-			Cams()
-			Mic()
+			Command()
 			return()
 
 		Begin()
@@ -569,7 +478,7 @@ def KnexysCLI():
 			Edit()
 
 	def Perms():
-		print("Type 'Edit' or 'View' to edit/view your permissions, or type 'Return' to return to KnexysCLI.")
+		print("Type 'Edit' or 'View' to edit/view your permissions, or type 'Return' to return to KCLI.")
 		Edit()
 
 	def PasscodeEditI():
@@ -646,11 +555,11 @@ def KnexysCLI():
 			if (Alpha == X):
 				print("Warning: This may not work, and could crash the program.")
 				KSW()
-				Command()
 			else:
 				print("You do not have the correct permissions for this command.")
 				Command()
 		elif ("Perms/View" == Beta):
+			print("Permissions: ")
 			View()
 			Command()
 		elif ("Version" == Beta):
@@ -659,7 +568,9 @@ def KnexysCLI():
 		elif ("Error_List" == Beta):
 			print("All Errors Below:")
 			print("Error_001: Command was not found.")
-			print("Error_002: Pip was not installed correctly, some commands may not work.")
+			print("Error_002: Some commands may not work, pip/pip module(s) were not installed correctly.")
+			print("Error_003: Startup Error.")
+			print("Error_004: Unknown Error.")
 			Command()
 		elif ("Status" == Beta):
 			print("Checking Systems... All Good.")
@@ -755,4 +666,12 @@ def KnexysCLI():
 	Start()
 	return()
 
-KnexysCLI()
+def Terminal_Check():
+	import sys
+	if sys.stdin.isatty():
+		KnexysCLI()
+	else:
+		raise RuntimeError("Error_003: It's not recommended to execute this code in a non-terminal environment. Call 'KnexysCLI()' to execute anyway.")
+	return()
+
+Terminal_Check()
