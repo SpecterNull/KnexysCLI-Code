@@ -85,7 +85,7 @@ def KnexysCLI():
 
 		def Download():
 			import os
-			packages = ['requests','tqdm','opencv-python','sounddevice','soundfile']
+			packages = ['requests','tqdm','opencv-python','sounddevice','soundfile','geopy']
 			for package in packages:
 				try:
 					os.system(f'pip install {package}')
@@ -99,19 +99,16 @@ def KnexysCLI():
 			except ImportError:
 				print("Installing required packages...")
 				subprocess.run(["pip", "install", "requests", "tqdm"])
-				print("Packages installed successfully!")
+				print("Packages installed successfully.")
 
 		def Scan_Data():
 			import os
 			import socket
 			import requests
+			import subprocess
 			from tqdm import tqdm
-			def get_owner_name(ip_address):
-				try:
-					hostname, _, _ = socket.gethostbyaddr(ip_address)
-					return hostname
-				except (socket.timeout, ConnectionRefusedError, socket.herror):
-					return 'Unknown_Hostname'
+			from geopy.geocoders import Nominatim
+			from geopy.exc import GeocoderTimedOut, GeocoderUnavailable
 
 			def get_local_ip():
 				return socket.gethostbyname(socket.gethostname())
@@ -123,19 +120,67 @@ def KnexysCLI():
 				except Exception:
 					return 'Unknown_Public_IP'
 
+			def get_owner_name(ip_address):
+				try:
+					hostname, _, _ = socket.gethostbyaddr(ip_address)
+					if hostname != ip_address:
+						return hostname
+				except (socket.timeout, ConnectionRefusedError, socket.herror, OSError):
+					pass
+				try:
+					hostname = socket.getfqdn(ip_address)
+					if hostname != ip_address:
+						return hostname
+				except (socket.timeout, ConnectionRefusedError, socket.herror, OSError):
+					pass
+				try:
+					ping_output = subprocess.check_output(['ping', '-c', '1', ip_address]).decode()
+					hostname = ping_output.split('(')[1].split(')')[0]
+					if hostname != ip_address:
+						return hostname
+				except (subprocess.CalledProcessError, IndexError, OSError):
+					pass
+				return 'Unknown_Hostname'
+
 			def get_geolocation(ip_address):
 				try:
 					url = f"http://ip-api.com/json/{ip_address}"
 					response = requests.get(url)
-					data = response.json()
-					return data
-				except Exception:
-					return 'Geolocation not available'
-
+					if response.status_code == 200:
+						data = response.json()
+						if data['status'] == 'success':
+							return {
+								'country': data.get('country', 'Unknown'),
+								'state': data.get('regionName', 'Unknown'),
+								'city': data.get('city', 'Unknown'),
+								'latitude': data.get('lat', 'Unknown'),
+								'longitude': data.get('lon', 'Unknown')
+							}
+				except Exception as e:
+					pass
+				try:
+					geolocator = Nominatim(user_agent="geoapiExercises")
+					location = geolocator.reverse((data['lat'], data['lon']))
+					return {
+						'country': location.raw['address'].get('country', 'Unknown'),
+						'state': location.raw['address'].get('state', 'Unknown'),
+						'city': location.raw['address'].get('city', 'Unknown'),
+						'latitude': data.get('lat', 'Unknown'),
+						'longitude': data.get('lon', 'Unknown')
+					}
+				except (GeocoderTimedOut, GeocoderUnavailable, KeyError) as e:
+					pass
+				return {
+					'country': 'Unknown',
+					'state': 'Unknown',
+					'city': 'Unknown',
+					'latitude': 'Unknown',
+					'longitude': 'Unknown'
+				}
 			devices = []
 			local_ip = get_local_ip()
 			network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
-			for i in range(1, 255):
+			for i in tqdm(range(1, 255)):
 				ip_address = network_prefix + str(i)
 				try:
 					with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -155,13 +200,18 @@ def KnexysCLI():
 
 			print("Obtained Information:")
 			for device in devices:
-				Clear()
 				print("Knexys Spyware Scan Results: ")
 				print(f"IP: {device['IP']}")
 				print(f"Hostname: {device['Hostname']}")
 				print(f"Public IP: {device['Public_IP']}")
-				print(f"Geolocation: {device['Geolocation']}\n")
+				print("Geolocation:")
+				print(f"Country: {device['Geolocation']['country']}")
+				print(f"State: {device['Geolocation']['state']}")
+				print(f"City: {device['Geolocation']['city']}")
+				print(f"Latitude: {device['Geolocation']['latitude']}")
+				print(f"Longitude: {device['Geolocation']['longitude']}")
 				print(" ")
+
 
 		def Cams():
 			import cv2
@@ -261,8 +311,6 @@ def KnexysCLI():
 		def Begin():
 			global Command
 			Clear()
-			print("Activating KSW (Knexys Spyware).")
-			print("This may take a moment...")
 			Pip()
 			Download()
 			D2()
@@ -672,12 +720,4 @@ def KnexysCLI():
 	Start()
 	return()
 
-def Terminal_Check():
-	import sys
-	if sys.stdin.isatty():
-		KnexysCLI()
-	else:
-		raise RuntimeError("Error_003: It's not recommended to execute this code in a non-terminal environment. Call 'KnexysCLI()' to execute anyway.")
-	return()
-
-Terminal_Check()
+KnexysCLI()
