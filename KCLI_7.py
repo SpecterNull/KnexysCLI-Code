@@ -1,10 +1,10 @@
-#Hello, my name is Ayan Alam, I am 11, I started coding a few months ago this code was made in around the beginning of 2024. This is a basic CLI program for files and scanning.
-
-#The variables may be messy, but they are only in the function, to avoid any conflict, I checked every situation, you don't have to doubt my code.
-
-#This code can be useful for a few things, but one of the cooler features is spyware.
-
-def KnexysCLI():
+def KnexyceCLI():
+	#This code is owned by Knexyce.
+	#KnexyceCLI was created by Ayan Alam, Member-003 of Knexyce.
+	#Some variables may be confusing. Also keep in mind, do not tamper with the code, unless given permission, or if you know what to do.
+	#This code is a CLI system for managing files, and permissions.
+	#Variables are kept inside the function.
+	#This is V-7.0.0 of KCLI.
 	global U, C, X, Z, Alpha, Gamma, FA, FB, FC, FD, FE, text, BOLD, GREEN_BOLD, DARK_RED, DARK_RED_BOLD, GREEN, LIGHT_BLUE, COLOR_RESET, Command, subprocess
 	LIGHT_BLUE = ''
 	COLOR_RESET = ''
@@ -15,9 +15,9 @@ def KnexysCLI():
 	BOLD = ''
 	DARK_RED = ''
 	GREEN = ''
-	Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
-	X = DARK_RED_BOLD + "Admin@Knexys: " + COLOR_RESET + LIGHT_BLUE
-	Z = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
+	Alpha = GREEN_BOLD + "User@Knexyce: " + COLOR_RESET + LIGHT_BLUE
+	X = DARK_RED_BOLD + "Admin@Knexyce: " + COLOR_RESET + LIGHT_BLUE
+	Z = GREEN_BOLD + "User@Knexyce: " + COLOR_RESET + LIGHT_BLUE
 	U = "0000"
 	C = "0000"
 	FA = "No file exists, to create one, type 'File_Create'."
@@ -26,305 +26,6 @@ def KnexysCLI():
 	FD = "No file exists, to create one, type 'File_Create'."
 	FE = "No file exists, to create one, type 'File_Create'."
 	Gamma = False
-
-	def Pip():
-		import os
-		import subprocess
-		import sys
-		import platform
-		import urllib.request
-		try:
-			subprocess.run([sys.executable, '-m', 'ensurepip', '--default-pip'], check=True)
-			pass
-		except Exception as eI:
-			print("Error_002")
-			try:
-				urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py')
-				subprocess.run([sys.executable, 'get-pip.py'], check=True)
-				pass
-			except Exception as eII:
-				print("Error_002")
-				try:
-					subprocess.run(['easy_install', 'pip'], check=True)
-					pass
-				except Exception as eIII:
-					print("Error_002")
-
-	def Download():
-		import os
-		packages = ['opencv-python']
-		for package in packages:
-			try:
-				os.system(f'pip install {package}')
-			except Exception as e:
-				print("Error_002")
-
-	def KSW():
-		def Pip():
-			import os
-			import subprocess
-			import sys
-			import platform
-			import urllib.request
-			try:
-				subprocess.run([sys.executable, '-m', 'ensurepip', '--default-pip'], check=True)
-				pass
-			except Exception as eI:
-				print("Error_002")
-				try:
-					urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py')
-					subprocess.run([sys.executable, 'get-pip.py'], check=True)
-					pass
-				except Exception as eII:
-					print("Error_002")
-					try:
-						subprocess.run(['easy_install', 'pip'], check=True)
-						pass
-					except Exception as eIII:
-						print("Error_002")
-
-		def Download():
-			import os
-			packages = ['requests','tqdm','opencv-python','sounddevice','soundfile','geopy']
-			for package in packages:
-				try:
-					os.system(f'pip install {package}')
-				except Exception as e:
-					print("Error_002")
-
-		def D2():
-			try:
-				import requests
-				from tqdm import tqdm
-			except ImportError:
-				print("Installing required packages...")
-				subprocess.run(["pip", "install", "requests", "tqdm"])
-				print("Packages installed successfully.")
-
-		def Scan_Data():
-			import os
-			import socket
-			import requests
-			import subprocess
-			from tqdm import tqdm
-			from geopy.geocoders import Nominatim
-			from geopy.exc import GeocoderTimedOut, GeocoderUnavailable
-
-			def get_local_ip():
-				return socket.gethostbyname(socket.gethostname())
-
-			def get_public_ip():
-				try:
-					response = requests.get('https://api.ipify.org')
-					return response.text
-				except Exception:
-					return 'Unknown_Public_IP'
-
-			def get_owner_name(ip_address):
-				try:
-					hostname, _, _ = socket.gethostbyaddr(ip_address)
-					if hostname != ip_address:
-						return hostname
-				except (socket.timeout, ConnectionRefusedError, socket.herror, OSError):
-					pass
-				try:
-					hostname = socket.getfqdn(ip_address)
-					if hostname != ip_address:
-						return hostname
-				except (socket.timeout, ConnectionRefusedError, socket.herror, OSError):
-					pass
-				try:
-					ping_output = subprocess.check_output(['ping', '-c', '1', ip_address]).decode()
-					hostname = ping_output.split('(')[1].split(')')[0]
-					if hostname != ip_address:
-						return hostname
-				except (subprocess.CalledProcessError, IndexError, OSError):
-					pass
-				return 'Unknown_Hostname'
-
-			def get_geolocation(ip_address):
-				try:
-					url = f"http://ip-api.com/json/{ip_address}"
-					response = requests.get(url)
-					if response.status_code == 200:
-						data = response.json()
-						if data['status'] == 'success':
-							return {
-								'country': data.get('country', 'Unknown'),
-								'state': data.get('regionName', 'Unknown'),
-								'city': data.get('city', 'Unknown'),
-								'latitude': data.get('lat', 'Unknown'),
-								'longitude': data.get('lon', 'Unknown')
-							}
-				except Exception as e:
-					pass
-				try:
-					geolocator = Nominatim(user_agent="geoapiExercises")
-					location = geolocator.reverse((data['lat'], data['lon']))
-					return {
-						'country': location.raw['address'].get('country', 'Unknown'),
-						'state': location.raw['address'].get('state', 'Unknown'),
-						'city': location.raw['address'].get('city', 'Unknown'),
-						'latitude': data.get('lat', 'Unknown'),
-						'longitude': data.get('lon', 'Unknown')
-					}
-				except (GeocoderTimedOut, GeocoderUnavailable, KeyError) as e:
-					pass
-				return {
-					'country': 'Unknown',
-					'state': 'Unknown',
-					'city': 'Unknown',
-					'latitude': 'Unknown',
-					'longitude': 'Unknown'
-				}
-			devices = []
-			local_ip = get_local_ip()
-			network_prefix = '.'.join(local_ip.split('.')[:-1]) + '.'
-			for i in tqdm(range(1, 255)):
-				ip_address = network_prefix + str(i)
-				try:
-					with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-						s.settimeout(0.1)
-						s.connect((ip_address, 80))
-						owner_name = get_owner_name(ip_address)
-						public_ip = get_public_ip()
-						geolocation = get_geolocation(ip_address)
-						devices.append({
-							'IP': ip_address,
-							'Hostname': owner_name,
-							'Public_IP': public_ip,
-							'Geolocation': geolocation
-						})
-				except (socket.timeout, ConnectionRefusedError):
-					pass
-
-			print("Obtained Information:")
-			for device in devices:
-				print("Knexys Spyware Scan Results: ")
-				print(f"IP: {device['IP']}")
-				print(f"Hostname: {device['Hostname']}")
-				print(f"Public IP: {device['Public_IP']}")
-				print("Geolocation:")
-				print(f"Country: {device['Geolocation']['country']}")
-				print(f"State: {device['Geolocation']['state']}")
-				print(f"City: {device['Geolocation']['city']}")
-				print(f"Latitude: {device['Geolocation']['latitude']}")
-				print(f"Longitude: {device['Geolocation']['longitude']}")
-				print(" ")
-
-
-		def Cams():
-			import cv2
-			import requests
-			import socket
-			import concurrent.futures
-			import logging
-			import os
-			logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-			def get_local_ip():
-				try:
-					s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-					s.connect(("8.8.8.8", 80))
-					local_ip = s.getsockname()[0]
-					s.close()
-					return local_ip
-				except Exception as e:
-					logging.error(f"Error getting local IP address: {e}")
-					return None
-
-			def discover_devices():
-				devices = []
-				try:
-					logging.info("Scanning network for devices...")
-					output = os.popen("arp -a").read()
-					lines = output.split('\n')
-					for line in lines:
-						parts = line.split()
-						if len(parts) >= 2:
-							ip_address = parts[0]
-							if ip_address != "Internet":
-								devices.append({'IP': ip_address, 'Hostname': parts[1]})
-					logging.info("Scan completed.")
-				except Exception as e:
-					logging.error(f"Error scanning network: {e}")
-				return devices
-
-			def access_camera(ip_address):
-				try:
-					web_interface_url = f"http://{ip_address}/login"
-					response = requests.get(web_interface_url, timeout=10)
-					if response.status_code == 200:
-						video_url = response.json().get('video_url')
-						if video_url:
-							cap = cv2.VideoCapture(video_url)
-							if cap.isOpened():
-								while True:
-									ret, frame = cap.read()
-									if ret:
-										cv2.imshow('Camera Feed', frame)
-										if cv2.waitKey(1) & 0xFF == ord('q'):
-											break
-									else:
-										break
-								cap.release()
-								cv2.destroyAllWindows()
-							else:
-								logging.warning(f"Failed to open video stream from camera at IP: {ip_address}")
-						else:
-							logging.warning(f"No video stream URL found for camera at IP: {ip_address}")
-					else:
-						logging.warning(f"Unable to access camera at IP {ip_address}. HTTP status code: {response.status_code}")
-				except requests.RequestException as e:
-					logging.error(f"Error accessing camera at IP {ip_address}: {e}")
-			local_ip = get_local_ip()
-			if not local_ip:
-				logging.error("Failed to obtain local IP address. Exiting.")
-				return
-			logging.info(f"Local IP address: {local_ip}")
-			devices = discover_devices()
-			if not devices:
-				logging.error("No devices found on the network. Exiting.")
-				return
-			logging.info(f"Found {len(devices)} devices on the network.")
-			with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-				futures = [executor.submit(access_camera, device['IP']) for device in devices]
-			logging.info("All camera access attempts completed.")
-
-		def Clear():
-			import os
-			import platform
-			ms = [
-				'cls' if platform.system() == 'Windows' else 'clear',
-				'tput clear',
-				'reset'
-			]
-			for m in ms:
-				try:
-					os.system(m)
-					break
-				except Exception as e:
-					continue
-			else:
-				pass
-
-		def Begin():
-			global Command
-			Clear()
-			Pip()
-			Download()
-			D2()
-			Clear()
-			print(" ")
-			print("Activating KSW (Knexys Spyware).")
-			print("This may take a moment...")
-			print(" ")
-			Scan_Data()
-			Command()
-			return()
-
-		Begin()
-		return()
 
 	def ChangeText(text):
 		import os
@@ -359,7 +60,7 @@ def KnexysCLI():
 		C = AA
 		BB = input("New Permissions Passcode: ")
 		U = AA
-		print("All done, KnexysCLI has restarted.")
+		print("All done, KnexyceCLI has restarted.")
 		Space()
 		Restart()
 
@@ -376,13 +77,12 @@ def KnexysCLI():
 		print("'Perms/Passcode', Edit permissions passcode.")
 		print("'Edit_Passcode', Edit passcode.")
 		print("'Error_List', Lists all error types and meanings of errors.")
-		print("'Info', Info about Knexys, and KnexysCLI.")
+		print("'Info', Info about Knexyce, and KnexyceCLI.")
 		print("'Help', Some information, and a list of commands.")
-		print("'Exit, Exit KnexysCLI.")
+		print("'Exit, Exit KnexyceCLI.")
 		print("'Restart', Restart this program.")
 		print("'Status', Tests if the code works.")
 		print("'Version', Shows the version of this program.")
-		print("'Spyware', Attempt to scan info of users on your network.")
 
 	def FileCreateA():
 		global FA
@@ -496,7 +196,7 @@ def KnexysCLI():
 		elif("User" == Gamma):
 			Alpha = Z
 		else:
-			Alpha = GREEN_BOLD + "User@Knexys: " + COLOR_RESET + LIGHT_BLUE
+			Alpha = GREEN_BOLD + "User@Knexyce: " + COLOR_RESET + LIGHT_BLUE
 
 	def Decide():
 		global Alpha, Gamma, X, Z
@@ -516,7 +216,7 @@ def KnexysCLI():
 			print("Returned to CLI.")
 			Command()
 		else:
-			print("Not an option, type 'Return' to return to KnexysCLI.")
+			print("Not an option, type 'Return' to return to KnexyceCLI.")
 			Decide()
 
 	def Edit():
@@ -555,7 +255,7 @@ def KnexysCLI():
 		Perms()
 
 	def FileView():
-		print("Pick a file from '1' to '5' to view, or type 'Return' to return to KnexysCLI.")
+		print("Pick a file from '1' to '5' to view, or type 'Return' to return to KnexyceCLI.")
 		V = input("Choose File: ")
 		if ("1" == V):
 			print(FA)
@@ -594,24 +294,17 @@ def KnexysCLI():
 			List()
 			Command()
 		elif ("Exit" == Beta):
-			print(DARK_RED_BOLD + "KnexysCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
+			print(DARK_RED_BOLD + "KnexyceCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
 			Clear()
 		elif ("Edit_Passcode" == Beta):
 			AccessI()
 		elif ("Info" == Beta):
-			print("KnexysCLI is a program owned by Knexys.")
+			print("KnexyceCLI is a program owned by Knexyce.")
 			print("The main purpose of this code is creating, viewing, and managing files.")
-			print("Knexys is a group with 4 main goals, control, power, strength, and) intelligence.")
+			print("Knexyce is a group with 4 main goals, control, power, strength, and) intelligence.")
 			Command()
 		elif ("Permissions" == Beta):
 			Ed()
-		elif ("Spyware" == Beta):
-			if (Alpha == X):
-				print("Warning: This may not work, and could crash the program.")
-				KSW()
-			else:
-				print("You do not have the correct permissions for this command.")
-				Command()
 		elif ("Perms/View" == Beta):
 			print("Permissions: ")
 			View()
@@ -622,7 +315,7 @@ def KnexysCLI():
 		elif ("Error_List" == Beta):
 			print("All Errors Below:")
 			print("Error_001: Command was not found.")
-			print("Error_002: Some commands may not work, pip/pip module(s) were not installed correctly.")
+			print("Error_002: Some commands may not work, module(s) were not installed correctly.")
 			print("Error_003: Startup Error.")
 			print("Error_004: Unknown Error.")
 			Command()
@@ -657,7 +350,7 @@ def KnexysCLI():
 			Create()
 
 	def Terminal():
-		print("""Welcome to KnexysCLI, Passcode Correct. KCLI: Knexys Command Line Interface""")
+		print("""Welcome to KnexyceCLI, Passcode Correct. KCLI: Knexyce Command Line Interface""")
 		print("Type the 'Help' command for help, without the quotes.")
 		Command()
 
@@ -670,7 +363,7 @@ def KnexysCLI():
 			Level()
 			Terminal()
 		elif ("Exit" == Theta):
-			print(DARK_RED_BOLD + "KnexysCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
+			print(DARK_RED_BOLD + "KnexyceCLI has been exited." + COLOR_RESET + LIGHT_BLUE)
 			Clear()
 		else:
 			print(DARK_RED_BOLD + "Incorrect." + COLOR_RESET + LIGHT_BLUE)
@@ -700,24 +393,20 @@ def KnexysCLI():
 		Passcode()
 
 	def	Entry():
-		print("KnexysCLI")
+		print("KnexyceCLI")
 		PasscodeInfo()
 
 	def Restart():
 		Clear()
 		print(LIGHT_BLUE + "[=====]" + LIGHT_BLUE)
 		Entry()
-		return()
 
 	def Start():
-		Clear()
-		Pip()
-		Download()
 		Clear()
 		print(" ")
 		Restart()
 
 	Start()
-	return()
+	return
 
-KnexysCLI()
+KnexyceCLI()
