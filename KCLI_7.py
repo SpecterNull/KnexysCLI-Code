@@ -1,6 +1,6 @@
 def KnexyceCLI():
 	#This code is owned by Knexyce.
-	#KnexyceCLI was created by Ayan Alam, Member-003 of Knexyce.
+	#KnexyceCLI was created by Ayan Alam, Knexyce-003.
 	#Some variables may be confusing. Also keep in mind, do not tamper with the code, unless given permission, or if you know what to do.
 	#This code is a CLI system for managing files, and permissions.
 	#Variables are kept inside the function.
@@ -301,7 +301,7 @@ def KnexyceCLI():
 		elif ("Info" == Beta):
 			print("KnexyceCLI is a program owned by Knexyce.")
 			print("The main purpose of this code is creating, viewing, and managing files.")
-			print("Knexyce is a group with 4 main goals, control, power, strength, and) intelligence.")
+			print("Knexyce is a group with 4 main goals, (Control, power, strength, and intelligence.).")
 			Command()
 		elif ("Permissions" == Beta):
 			Ed()
