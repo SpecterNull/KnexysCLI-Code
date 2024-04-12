@@ -392,7 +392,7 @@ def KnexyceCLI():
 		print("Enter passcode to gain accsess.")
 		Passcode()
 
-	def	Entry():
+	def Entry():
 		print("KnexyceCLI")
 		PasscodeInfo()
 
